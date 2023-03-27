@@ -56,19 +56,67 @@ export default function(RED) {
           this.send(msg);
         }
       };
+
+      let del = (msg, key) => {
+        //删除key
+        let count = this.cacheNode.cache.del(key);
+        msg.payload=count;
+        sendMessage(msg);
+      };
+
+      let dump = (msg, likeKey) => {
+        //获取所有key-value
+        this.cacheNode.cache.keys((err, keys) => {
+          if (!err) {
+            let filterKeys = []
+            if(likeKey){
+              keys.forEach(k=>{
+                if(k.startsWith(likeKey)){
+                  filterKeys.push(k)
+                }
+              });
+            }
+            this.cacheNode.cache.mget(filterKeys, (err, value) => {
+                RED.util.setMessageProperty(msg, this.valueProperty, value);
+                sendMessage(msg);
+            });
+          }
+        });
+      };
+
+      let keys = (msg,likeKey) => {
+        this.cacheNode.cache.keys((err, keys) => {
+          if (!err) {
+            let result = [];
+            if(likeKey){
+              keys.forEach(key=>{
+                 if(key.startsWith(likeKey)){
+                  result.push(key);
+                }
+              })
+            }else{
+              result = keys;
+            }
+            RED.util.setMessageProperty(msg, this.valueProperty, result);
+            sendMessage(msg);
+          }
+        });
+      };
+
       this.on('input', (msg) => {
         if (this.cacheNode) {
-          if (msg.dump || msg.payload && msg.payload.dump) {
-            this.cacheNode.cache.keys((err, keys) => {
-              if (!err) {
-                this.cacheNode.cache.mget(keys, (err, value) => {
-                  RED.util.setMessageProperty(msg, this.valueProperty, value);
-                  sendMessage(msg);
-                });
-              }
-            });
-          } else {
-            let key = RED.util.getMessageProperty(msg, this.keyProperty);
+          let key = RED.util.getMessageProperty(msg, this.keyProperty);
+          if(msg.option){
+            if(msg.option === 'delete'){
+              del(msg, key);
+            }
+            if(msg.option === 'dump'){
+              dump(msg, key);
+            }
+            if(msg.option === 'keys'){
+              keys(msg, key);
+            }
+          }else {
             if (key) {
               this.cacheNode.cache.get(key, (err, value) => {
                 if (!err) {
@@ -103,6 +151,7 @@ export default function(RED) {
       }
       this.name = n.name;
       this.on('input', (msg) => {
+        console.info(msg.topic);
         if (this.cacheNode) {
           let key = RED.util.getMessageProperty(msg, this.keyProperty);
           if (key) {
