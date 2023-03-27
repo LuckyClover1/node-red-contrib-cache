@@ -7,18 +7,22 @@
   <dl class="message-properties">
     <dt>topic<span class="property-type">string</span></dt>
     <dd>
-    The key associated with the stored value. Mandatory.
-    The name of this property (<code>topic</code>) is configurable in <code>Cache</code> config node.
-    This value is IGNORED when <code>dump</code> property is <code>true</code>.
+    <p>The key associated with the stored value. Mandatory.
+    The name of this property (<code>topic</code>) is configurable in <code>Cache</code> config node.</p>
+    <p>This value is IGNORED when <code>option</code> property is <code>delete</code> or <code>dump</code>,
+    but not be IGNORE while <code>option</code> property is <code>keys</code>.</p>
     </dd>
-    <dt>dump<span class="property-type">boolean</span></dt>
+    <dt>option<span class="property-type">enum</span></dt>
     <dd>
-    Whether or not to dump all entries in the cache.
-    This node copies all the values in the cache into the value property(<code>payload</code> by default).
+    ingore this property when store or get cache data by key. 
+    <p>the enum value must be <code>delete</code>, <code>dump</code> or <code>keys</code></p>
+    <p><code>dump</code>: dump all entries in the cache.copies all the values in the cache into the value property(<code>payload</code> by default)</p>
+    <p><code>delete</code>: delete entry in the cache which the key is <code>topic</code></p>
+    <p><code>keys</code>: return all keys in the cache, but only return keys which start with <code>topic</code> when <code>topic</code> is exist</p>
     </dd>
     <dt>payload<span class="property-type">object</span></dt>
     <dd>
-    The property could contain the above option parameter <code>dump</code> and its value.
+    the value store into cache.
     </dd>
   </dl>
 
@@ -30,11 +34,11 @@
     </dd>
     <dt>payload<span class="property-type">string</span></dt>
     <dd>
-    The stored value. Can be <code>null</code> when nothing is associated with the given key.
+    The get value, dump entities, keys list, or delete success num. Can be <code>null</code> when nothing is associated with the given key.
     </dd>
-    <dt>dump<span class="property-type">boolean</span></dt>
+    <dt>option<span class="property-type">enum</span></dt>
     <dd>
-    Whether or not to dump all entries in the cache.
+      <code>delete</code>, <code>dump</code> or <code>keys</code></p>
     </dd>
   </dl>
 </script>
